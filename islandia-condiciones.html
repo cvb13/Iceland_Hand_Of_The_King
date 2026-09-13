@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#132630">
+<title>Islandia 27 sep – 7 oct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --basalt:#132630;      /* fondo, basalto mojado */
+  --basalt-2:#1B3340;    /* tarjeta */
+  --basalt-3:#254456;    /* borde */
+  --glacier:#9FD4E3;     /* acento agua de deshielo */
+  --moss:#7BA860;        /* ok */
+  --amber:#E0A53F;       /* ojo */
+  --lava:#C24530;        /* alto */
+  --text:#EAF1F4;
+  --muted:#93A9B6;
+  --shadow:0 1px 0 rgba(255,255,255,.04) inset;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--basalt);
+  color:var(--text);
+  font-family:Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:80px;
+}
+button{font-family:inherit;color:inherit}
+a{color:var(--glacier)}
+.wrap{max-width:560px;margin:0 auto;padding:0 14px}
+
+/* ---------- cabecera ---------- */
+header{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,var(--basalt) 72%,rgba(19,38,48,0));
+  padding:12px 0 10px;
+}
+.bar{display:flex;align-items:baseline;gap:10px}
+.clock{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.clock span{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.daychip{margin-left:auto;font-size:12px;color:var(--muted)}
+.refresh{background:none;border:1px solid var(--basalt-3);border-radius:999px;
+  padding:4px 11px;font-size:12px;color:var(--muted)}
+.refresh:active{background:var(--basalt-2)}
+
+/* ---------- selector de día ---------- */
+.days{display:flex;gap:6px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{
+  flex:0 0 auto;border:1px solid var(--basalt-3);background:var(--basalt-2);
+  border-radius:10px;padding:6px 10px;font-size:12px;color:var(--muted);
+  white-space:nowrap;line-height:1.2;text-align:left
+}
+.day b{display:block;font-size:15px;color:var(--text);font-weight:600}
+.day.on{border-color:var(--glacier);background:#22404F}
+.day.on b{color:var(--glacier)}
+
+/* ---------- veredicto ---------- */
+.verdict{
+  border-radius:16px;padding:16px;margin:10px 0 14px;
+  border:1px solid var(--basalt-3);background:var(--basalt-2);box-shadow:var(--shadow);
+  border-left-width:5px;
+}
+.verdict.ok{border-left-color:var(--moss)}
+.verdict.warn{border-left-color:var(--amber)}
+.verdict.stop{border-left-color:var(--lava)}
+.verdict h1{font-size:22px;line-height:1.2;margin:0 0 4px;letter-spacing:-.02em;font-weight:700}
+.verdict.ok h1{color:var(--moss)}
+.verdict.warn h1{color:var(--amber)}
+.verdict.stop h1{color:var(--lava)}
+.leg{font-size:13px;color:var(--muted);margin:0 0 10px}
+.reasons{list-style:none;margin:0;padding:0;font-size:14px}
+.reasons li{display:flex;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.06)}
+.reasons li:first-child{border-top:0}
+.reasons .k{color:var(--muted);flex:0 0 96px}
+.reasons .v{flex:1}
+.big{font-size:34px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+
+/* ---------- tarjetas ---------- */
+section{margin:0 0 14px}
+h2{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 8px;letter-spacing:.01em}
+.card{background:var(--basalt-2);border:1px solid var(--basalt-3);border-radius:14px;padding:14px}
+.row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid rgba(255,255,255,.06)}
+.row:first-child{border-top:0;padding-top:0}
+.row:last-child{padding-bottom:0}
+.time{flex:0 0 46px;font-size:13px;color:var(--glacier);font-variant-numeric:tabular-nums;padding-top:1px}
+.what{flex:1;min-width:0}
+.what b{font-weight:600}
+.note{font-size:12.5px;color:var(--muted);margin-top:2px}
+.now{background:#22404F;margin:0 -8px;padding:9px 8px;border-radius:9px;border-top:0}
+
+/* ---------- viento por parada ---------- */
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.wp{flex:0 0 108px;background:var(--basalt-2);border:1px solid var(--basalt-3);
+  border-radius:12px;padding:10px}
+.wp .nm{font-size:11.5px;color:var(--muted);height:28px;overflow:hidden;line-height:1.2}
+.wp .g{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+.wp .g s{text-decoration:none;font-size:11px;font-weight:500;color:var(--muted)}
+.wp .m{font-size:11.5px;color:var(--muted);margin-top:2px}
+.wp.g-ok .g{color:var(--moss)} .wp.g-warn .g{color:var(--amber)} .wp.g-stop .g{color:var(--lava)}
+
+/* ---------- barra de luz ---------- */
+.light{height:34px;border-radius:9px;overflow:hidden;display:flex;margin-top:6px;
+  border:1px solid var(--basalt-3)}
+.light i{display:block;height:100%}
+.lseg{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-top:5px}
+
+/* ---------- estados ---------- */
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:6px;
+  border:1px solid currentColor;margin-left:6px;vertical-align:1px}
+.t-ok{color:var(--moss)} .t-warn{color:var(--amber)} .t-stop{color:var(--lava)}
+.t-mute{color:var(--muted)}
+
+.links{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.links a{display:block;background:var(--basalt-2);border:1px solid var(--basalt-3);
+  border-radius:12px;padding:11px 12px;text-decoration:none;color:var(--text);font-size:14px}
+.links a s{display:block;text-decoration:none;font-size:11.5px;color:var(--muted);margin-top:1px}
+.links a.sos{border-color:var(--lava);color:var(--lava)}
+
+.mini{font-size:12px;color:var(--muted)}
+.err{color:var(--amber);font-size:12.5px}
+footer{padding:18px 0 30px;font-size:11.5px;color:var(--muted);line-height:1.5}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.dot.live{background:var(--moss)}
+.dot.old{background:var(--amber)}
+.dot.dead{background:var(--lava)}
+.sub{width:100%;text-align:left;background:none;border:0;padding:0}
+@media (prefers-reduced-motion:no-preference){
+  .verdict{transition:border-color .2s}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="bar">
+      <div class="clock" id="clock">--:--<span>Islandia</span></div>
+      <button class="refresh" id="refresh">Actualizar</button>
+    </div>
+    <div class="daychip" id="daychip"></div>
+    <div class="days" id="days"></div>
+  </header>
+
+  <div class="verdict" id="verdict">
+    <h1 id="vtitle">Cargando…</h1>
+    <p class="leg" id="vleg"></p>
+    <ul class="reasons" id="vreasons"></ul>
+  </div>
+
+  <section>
+    <h2>Ráfagas máximas de hoy, parada por parada</h2>
+    <div class="strip" id="wind"></div>
+    <p class="mini" id="windnote"></p>
+  </section>
+
+  <section>
+    <h2>Luz</h2>
+    <div class="card">
+      <div id="lightsum"></div>
+      <div class="light" id="lightbar"></div>
+      <div class="lseg" id="lightlabels"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>El día</h2>
+    <div class="card" id="plan"></div>
+  </section>
+
+  <section>
+    <h2>Dormir</h2>
+    <div class="card" id="camp"></div>
+  </section>
+
+  <section>
+    <h2>Comida, gasolina y baños</h2>
+    <div class="card" id="services"></div>
+  </section>
+
+  <section>
+    <h2>Auroras</h2>
+    <div class="card" id="aurora"></div>
+  </section>
+
+  <section>
+    <h2>Estado de carreteras</h2>
+    <div class="card" id="roads"></div>
+  </section>
+
+  <section>
+    <h2>Abrir fuera de la app</h2>
+    <div class="links" id="links"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+<script>
+/* ===================== DATOS DEL VIAJE ===================== */
+/* Coordenadas aproximadas (±1 km): sirven para pronóstico, no para navegar.
+   Los botones de navegación buscan por nombre en Google Maps. */
+
+const TZ = "Atlantic/Reykjavik";
+
+const CAMPS = {
+  reykjavik:{n:"Reykjavík Eco Campsite (Laugardalur)",url:"https://reykjavikcampsite.is/",tel:"+3545538110",st:"pendiente",
+    note:"Abierto todo el año. Hay que reservar en línea: ahí les mandan el código del portón del área de campers. Recepción 07:30–22:00, check-in desde las 13:00. Está pegado a la piscina de Laugardalslaug."},
+  hvolsvollur:{n:"Hvolsvöllur Camp Site",url:"https://www.hvolsvollurcamping.is/",tel:"+3544878050",st:"confirmar",
+    note:"Alternativa: seguir a Vík si rinden el día."},
+  vik:{n:"Vík Camping",url:"http://www.vikcamping.is/map.html",tel:"+3544871345",st:"confirmar",
+    note:"Temporada declarada 15 abr – 8 nov. Confirmar por escrito."},
+  skaftafell:{n:"Tjaldsvæðið í Skaftafelli",url:"https://www.vatnajokulsthjodgardur.is/en/areas/skaftafell/tjaldsvaedid-i-skaftafelli",tel:"",st:"pendiente",
+    note:"Se reserva y paga en línea. Dos noches: 30 sep y 1 oct. Es la reserva más urgente."},
+  vestrahorn:{n:"Vestrahorn Campsite (Viking Café)",url:"https://vikingcafe.is/",tel:"+3544782577",st:"confirmar",
+    note:"Se entra por el Viking Café. La entrada a Stokksnes se paga aparte."},
+  egilsstadir:{n:"Camping Egilsstaðir",url:"https://www.campegilsstadir.is/",tel:"+3544706800",st:"confirmar",
+    note:"Abierto todo el año. Reservar antes de llegar. Alternativa: Seyðisfjörður si está abierto."},
+  myvatn:{n:"Mývatn — Hlíð / Bjarg / CJA",url:"https://www.hlid.is/",tel:"",st:"confirmar",
+    note:"Bjarg: ferdabjarg@simnet.is. CJA pendiente de respuesta por correo."},
+  budardalur:{n:"Tjaldsvæðið Búðardal — Dalahestar",url:"https://www.dalahestar.is/",tel:"+3547671400",st:"ok",
+    note:"Confirmado por Carolin: abierto todo el año. No hay recepción ni reserva — se parquean donde les guste y ellos pasan a cobrar como a las 20:00, o si no a las 08:00 del día siguiente. Súper y N1 a 250 m."},
+  keflavik:{n:"Camping Keflavík",url:"https://www.visitreykjanes.is/",tel:"",st:"confirmar",
+    note:"Backups: Vogar camping, Grindavík. Dormir aquí y no en Reykjavík para el vuelo."}
+};
+
+const DAYS = [
+{ d:"2026-09-27", t:"Llegada + Reykjanes", km:75, drive:1.2, camp:"reykjavik",
+  stops:[
+    {h:"09:30",n:"Aterrizar KEF",la:63.985,lo:-22.605},
+    {h:"11:00",n:"Recoger la van — Iceland Campers",la:63.985,lo:-22.605,x:"Revisar: gas del calentador, agua, altura del vehículo."},
+    {h:"11:30",n:"Súper en Reykjanesbær (Bónus o Krónan)",la:64.004,lo:-22.565,x:"Domingo: Bónus suele abrir 11:00. Compra grande aquí, es la más barata del viaje."},
+    {h:"14:00",n:"Hallgrímskirkja + Sun Voyager",la:64.1417,lo:-21.9266},
+    {h:"16:00",n:"Sky Lagoon (reservado)",la:64.1156,lo:-21.9331,x:"Confirmar que esté abierta por la alerta de Reykjanes."},
+    {h:"19:45",n:"Salir de Sky Lagoon hacia el camping",la:64.1156,lo:-21.9331,x:"Son 15–20 min, no una hora: el camping quedó en Laugardalur y no en Selfoss."},
+    {h:"20:10",n:"Reykjavík Eco Campsite",la:64.1440,lo:-21.8790,x:"Recepción cierra a las 22:00. Con el código del portón se entra igual."}],
+  warn:["Dormir en Reykjavík en vez de Selfoss les devuelve ~50 min esta noche y deja Þingvellir a 45 min mañana."] },
+{ d:"2026-09-28", t:"Círculo Dorado", km:230, drive:3, camp:"hvolsvollur",
+  stops:[
+    {h:"08:00",n:"Þingvellir",la:64.2558,lo:-21.13,x:"Parqueo de pago P1."},
+    {h:"10:00",n:"Brúarfoss",la:64.2646,lo:-20.5136,x:"Llegar hasta el parqueo nuevo. Si no, son 3,5 km a pie. 750 ISK, se paga en Parka."},
+    {h:"12:30",n:"Geysir",la:64.3104,lo:-20.3024},
+    {h:"13:30",n:"Gullfoss",la:64.3271,lo:-20.1199},
+    {h:"14:00",n:"Friðheimar (pendiente de reservar)",la:64.133,lo:-20.418,x:"Solo con reserva. La hoja lo tiene como PENDIENTE."},
+    {h:"15:30",n:"Cráter Kerið (opcional)",la:64.0411,lo:-20.8852},
+    {h:"18:00",n:"Hvolsvöllur o Vík",la:63.7497,lo:-20.2244}],
+  warn:["Arrancar 8:00 es opcional: la hoja sugiere 9:00 y dormir un poco más."] },
+{ d:"2026-09-29", t:"Costa sur", km:110, drive:1.75, camp:"vik",
+  stops:[
+    {h:"06:00",n:"Seljalandsfoss + Gljúfrabúi",la:63.6156,lo:-19.9886,x:"Parqueo de pago. A las 6:00 todavía está oscuro: el amanecer es ~7:25."},
+    {h:"08:00",n:"Skógafoss + Kvernufoss + hike",la:63.5321,lo:-19.5114},
+    {h:"12:30",n:"Sólheimajökull (mirador, 30 min a pie)",la:63.53,lo:-19.37},
+    {h:"14:30",n:"Dyrhólaey",la:63.4017,lo:-19.1258,x:"Se cierra con viento fuerte; el tramo alto es de lastre."},
+    {h:"16:00",n:"Reynisfjara",la:63.4055,lo:-19.0448,x:"NUNCA darle la espalda al mar. Las olas sneaker matan gente todos los años."},
+    {h:"17:30",n:"Vík",la:63.4187,lo:-19.006}],
+  warn:["Día corto de manejo: es el día para recuperar tiempo si el clima se pone feo."] },
+{ d:"2026-09-30", t:"Vík → Skaftafell", km:145, drive:2, camp:"skaftafell",
+  stops:[
+    {h:"08:00",n:"Salida de Vík",la:63.4187,lo:-19.006},
+    {h:"08:20",n:"Gígjagjá — cueva de Yoda (Hjörleifshöfði)",la:63.4176,lo:-18.7638,x:"REORDENADO: está 15 min al ESTE de Vík, no después de Fjaðrárgljúfur. Hacerla primero ahorra ~1h30 de devolverse. Tramo corto de lastre."},
+    {h:"09:40",n:"Eldhraun (mirador desde la ruta)",la:63.75,lo:-18.2},
+    {h:"10:10",n:"Fjaðrárgljúfur por la 206",la:63.7712,lo:-18.1719,x:"Caminata por los miradores del cañón, 1–1,5 h."},
+    {h:"12:00",n:"Kirkjubæjarklaustur — última gasolina antes de Freysnes",la:63.7906,lo:-18.0594,x:"Llenar aquí. Entre Klaustur y Höfn casi no hay estaciones."},
+    {h:"14:30",n:"Skaftafell: almuerzo y visitor center",la:64.0166,lo:-16.9666},
+    {h:"16:00",n:"Caminata a Svartifoss (2h ida y vuelta)",la:64.0276,lo:-16.9752,x:"Atardecer ~18:40. Salir a las 16:00 deja poco margen: llevar frontales."}],
+  warn:["El orden de la hoja manda a Gígjagjá después de Fjaðrárgljúfur, lo que obliga a devolverse ~60 km. Aquí va reordenado."] },
+{ d:"2026-10-01", t:"Jökulsárlón", km:170, drive:2.5, camp:"skaftafell",
+  stops:[
+    {h:"08:00",n:"Múlagljúfur / Kvíárjökull",la:63.92,lo:-16.42,x:"Acceso de lastre, despacio."},
+    {h:"11:30",n:"Fjallsárlón",la:64.013,lo:-16.38},
+    {h:"12:00",n:"Diamond Beach (marea baja)",la:64.043,lo:-16.177},
+    {h:"13:00",n:"Jökulsárlón",la:64.0784,lo:-16.2306},
+    {h:"15:00",n:"Hof (iglesia de turba, 5 min)",la:63.93,lo:-16.7},
+    {h:"15:30",n:"Svínafellsjökull",la:63.986,lo:-16.879},
+    {h:"17:00",n:"Regreso a Skaftafell",la:64.0166,lo:-16.9666}],
+  warn:["Extras de la hoja si sobra tiempo: Dverghamrar, Fossálar."] },
+{ d:"2026-10-02", t:"Tour del glaciar + Höfn + Stokksnes", km:165, drive:2.5, camp:"vestrahorn",
+  stops:[
+    {h:"07:00",n:"Salir de Skaftafell",la:64.0166,lo:-16.9666},
+    {h:"08:00",n:"Parqueo Jökulsárlón (lado oeste del puente)",la:64.0484,lo:-16.1806,x:"Día fijo. El tour arranca 9:30. Confirmar por escrito punto de encuentro y nombre del glaciar."},
+    {h:"16:00",n:"Salir hacia Höfn",la:64.0484,lo:-16.1806},
+    {h:"17:00",n:"Höfn: lavandería, duchas, Nettó, tanque lleno",la:64.2539,lo:-15.2093,x:"Nettó de Höfn: el último súper grande antes de Egilsstaðir."},
+    {h:"18:30",n:"Vestrahorn Campsite",la:64.247,lo:-14.988,x:"Pagar la entrada a Stokksnes en el Viking Café."}],
+  warn:["Con viento fuerte el atardecer se hace desde Höfn, no en Stokksnes."] },
+{ d:"2026-10-03", t:"Amanecer en Stokksnes + fiordos del este", km:280, drive:4, camp:"egilsstadir",
+  stops:[
+    {h:"06:45",n:"Levantarse (café en la van, sin desarmar nada)",la:64.247,lo:-14.988},
+    {h:"07:00",n:"Hora azul en Stokksnes",la:64.247,lo:-14.988,x:"Revisar marea y viento la noche anterior: con marea alta no existe el reflejo."},
+    {h:"07:25",n:"Amanecer: Vestrahorn sobre arena negra mojada",la:64.247,lo:-14.988},
+    {h:"09:00",n:"Viking village (entrada de pago)",la:64.2497,lo:-14.9755},
+    {h:"10:00",n:"Eystrahorn",la:64.41,lo:-14.56},
+    {h:"12:00",n:"Djúpivogur (almuerzo)",la:64.656,lo:-14.282},
+    {h:"13:00",n:"Fiordos del este por la ruta 1",la:64.83,lo:-14.01},
+    {h:"15:00",n:"Hengifoss (2h ida y vuelta)",la:65.077,lo:-14.883,x:"Se les puede acabar la luz a mitad de la caminata. Alternativa: hacerlo mañana temprano."},
+    {h:"18:00",n:"Egilsstaðir o Seyðisfjörður",la:65.2669,lo:-14.3948}],
+  warn:["NO tomar la 939 (Öxi): empinada, de lastre y mala con viento. Seguir la ruta 1 aunque sean 60 km más."] },
+{ d:"2026-10-04", t:"Stuðlagil y Mývatn", km:330, drive:4.5, camp:"myvatn",
+  stops:[
+    {h:"08:00",n:"Stuðlagil por la 923 (lastre largo)",la:65.14,lo:-15.35,x:"Seguir los carteles a Klaustursel Farm. Revisar el caudal de Hálslón antes: si sueltan agua el río se ve café."},
+    {h:"12:00",n:"Dettifoss por la 862 oeste (pavimentada)",la:65.8148,lo:-16.3846},
+    {h:"13:00",n:"Hverir (opcional)",la:65.64,lo:-16.808,x:"Si van a Stuðlagil, este es el primero que se cae."},
+    {h:"14:00",n:"Krafla / cráter Víti",la:65.716,lo:-16.756},
+    {h:"17:30",n:"Grjótagjá + Skútustaðagígar",la:65.626,lo:-16.885},
+    {h:"18:30",n:"Camping en Mývatn",la:65.643,lo:-16.912}],
+  warn:["Con Stuðlagil el día no alcanza completo. Quitar Hverir y salir antes.","Alternativas de la hoja: Dimmuborgir, Jarðböðin."] },
+{ d:"2026-10-05", t:"Norte → Búðardalur", km:405, drive:5, camp:"budardalur",
+  stops:[
+    {h:"08:00",n:"Salir de Mývatn",la:65.643,lo:-16.912,x:"El tramo Mývatn–Akureyri es el primero del país en recibir nieve en octubre. Revisar umferdin antes de arrancar."},
+    {h:"09:30",n:"Goðafoss",la:65.6828,lo:-17.55},
+    {h:"10:00",n:"Akureyri (café, gasolina, estirar)",la:65.6835,lo:-18.0878},
+    {h:"12:30",n:"Kolugljúfur o Hvítserkur",la:65.606,lo:-20.638},
+    {h:"17:00",n:"Búðardalur",la:65.112,lo:-21.77,x:"Se parquean donde quieran. Carolin pasa a cobrar como a las 20:00. Paguen esa noche: si lo dejan para las 08:00, es exactamente la hora a la que quieren estar saliendo."}],
+  warn:["El día más largo de manejo. Con van no importa llegar de noche.","Si vienen cansados: parar en Varmahlíð o Blönduós y dejar el resto para temprano.","Válvula de escape: manejar directo Mývatn–Reykjavík (480 km) y dejar el 6 como día suave, sacrificando Snæfellsnes."] },
+{ d:"2026-10-06", t:"Snæfellsnes + Reykjavík", km:380, drive:5, camp:"keflavik",
+  stops:[
+    {h:"07:30",n:"Check-in del vuelo a Nueva York",la:65.112,lo:-21.77},
+    {h:"08:00",n:"Salir de Búðardalur",la:65.112,lo:-21.77},
+    {h:"08:30",n:"Guðrúnarlaug (opcional, ~40 min de desvío)",la:65.07,lo:-21.68,x:"La hoja lo dice claro: no va a sobrar tiempo."},
+    {h:"09:15",n:"Playa Ytri Tunga",la:64.803,lo:-23.087},
+    {h:"10:15",n:"Búðakirkja (la iglesia negra)",la:64.821,lo:-23.386},
+    {h:"11:15",n:"Arnarstapi + Gatklettur",la:64.769,lo:-23.622},
+    {h:"13:30",n:"Cráter Saxhóll",la:64.893,lo:-23.809},
+    {h:"15:00",n:"Kirkjufell + Kirkjufellsfoss",la:64.927,lo:-23.311,x:"Si vienen atrasados, corten aquí y váyanse directo a Reykjavík."},
+    {h:"17:30",n:"Reykjavík: Hallgrímskirkja, Laugavegur, compras",la:64.1466,lo:-21.9426},
+    {h:"21:00",n:"Camping de Keflavík",la:64.004,lo:-22.565}],
+  warn:["Sky Lagoon 19:00 es opcional en este día."] },
+{ d:"2026-10-07", t:"Vuelo de regreso", km:10, drive:0.3, camp:null,
+  stops:[
+    {h:"07:00",n:"Levantarse, ordenar y vaciar la van",la:64.004,lo:-22.565,x:"Vaciar agua gris y sacar basura la noche anterior."},
+    {h:"07:30",n:"Llenar el tanque cerca de KEF",la:63.985,lo:-22.605},
+    {h:"08:00",n:"Entregar la van",la:63.985,lo:-22.605,x:"La inspección toma 20–30 minutos."},
+    {h:"08:30",n:"Estar en el aeropuerto",la:63.985,lo:-22.605},
+    {h:"11:25",n:"Vuelo a Nueva York",la:63.985,lo:-22.605}],
+  warn:["Dejar 3 horas entre levantarse y el vuelo."] }
+];
+
+/* Súper y gasolina asociados a cada día (horarios típicos: verificar) */
+const SERVICES = {
+ "2026-09-27":[{k:"super",n:"Bónus Reykjanesbær",h:"dom 11:00–18:00"},{k:"super",n:"Krónan Reykjanesbær",h:"dom 10:00–20:00"},{k:"gas",n:"N1 Fitjar, Reykjanesbær",h:"24 h"}],
+ "2026-09-28":[{k:"super",n:"Krónan Selfoss",h:"lun 10:00–20:00"},{k:"super",n:"Bónus Selfoss",h:"lun 11:00–18:30"},{k:"gas",n:"N1 Selfoss",h:"24 h"},{k:"gas",n:"Orkan Hvolsvöllur",h:"24 h"}],
+ "2026-09-29":[{k:"super",n:"Krónan Vík",h:"mar 9:00–20:00"},{k:"gas",n:"N1 Vík",h:"24 h"}],
+ "2026-09-30":[{k:"super",n:"Kjarval Kirkjubæjarklaustur",h:"mié 9:00–19:00"},{k:"gas",n:"N1 Kirkjubæjarklaustur",h:"24 h"},{k:"gas",n:"N1 Freysnes (junto a Skaftafell)",h:"24 h"}],
+ "2026-10-01":[{k:"gas",n:"N1 Freysnes",h:"24 h"},{k:"aviso",n:"No hay súper grande hasta Höfn",h:"272 km desde Vík"}],
+ "2026-10-02":[{k:"super",n:"Nettó Höfn",h:"vie 10:00–19:00"},{k:"gas",n:"N1 Höfn",h:"24 h"},{k:"lav",n:"Lavandería en Höfn",h:"revisar horario"}],
+ "2026-10-03":[{k:"super",n:"Samkaup Djúpivogur",h:"sáb 10:00–17:00"},{k:"super",n:"Bónus Egilsstaðir",h:"sáb 10:00–18:00"},{k:"gas",n:"N1 Djúpivogur",h:"24 h"},{k:"gas",n:"N1 Egilsstaðir",h:"24 h"}],
+ "2026-10-04":[{k:"super",n:"Samkaup Reykjahlíð (Mývatn)",h:"dom 10:00–18:00, caro y pequeño"},{k:"gas",n:"N1 Reykjahlíð",h:"24 h"},{k:"aviso",n:"Comprar en Egilsstaðir antes de salir",h:"el domingo el norte cierra temprano"}],
+ "2026-10-05":[{k:"super",n:"Nettó Akureyri",h:"lun 10:00–21:00"},{k:"super",n:"Bónus Akureyri",h:"lun 11:00–18:30"},{k:"gas",n:"N1 Akureyri",h:"24 h"},{k:"gas",n:"Orkan Blönduós",h:"24 h"}],
+ "2026-10-06":[{k:"super",n:"Bónus Borgarnes",h:"mar 11:00–18:30"},{k:"super",n:"Krónan Borgarnes",h:"mar 10:00–20:00"},{k:"gas",n:"N1 Vegamót (Snæfellsnes)",h:"24 h"},{k:"gas",n:"Orkan Ólafsvík",h:"24 h"}],
+ "2026-10-07":[{k:"gas",n:"Orkan / N1 Keflavík (antes de entregar)",h:"24 h"}]
+};
+
+const REGION = { // para el enlace directo al mapa de umferdin
+ "2026-09-27":"Suðvesturland","2026-09-28":"Suðurland","2026-09-29":"Suðurland",
+ "2026-09-30":"Suðurland","2026-10-01":"Suðurland","2026-10-02":"Austurland",
+ "2026-10-03":"Austurland","2026-10-04":"Norðausturland","2026-10-05":"Norðurland",
+ "2026-10-06":"Vesturland","2026-10-07":"Suðvesturland" };
+</script>
+<script>
+/* ===================== UTILIDADES ===================== */
+/* Islandia es UTC todo el año y no cambia a horario de verano,
+   así que la hora local del viaje y la hora UTC son la misma cosa. */
+const pad=n=>String(n).padStart(2,"0");
+const hhmm=d=>pad(d.getUTCHours())+":"+pad(d.getUTCMinutes());
+const isoDay=d=>d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate());
+const nowIS=()=>new Date();
+const minsOf=s=>{const[a,b]=s.split(":").map(Number);return a*60+b};
+const DOW=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MON=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function prettyDate(iso){const d=new Date(iso+"T12:00:00Z");
+  return DOW[d.getUTCDay()]+" "+d.getUTCDate()+" "+MON[d.getUTCMonth()]}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}}
+
+/* --- posición del sol (algoritmo NOAA, todo en UTC) --- */
+const rad=Math.PI/180,dayMs=864e5,J1970=2440588,J2000=2451545,e0=rad*23.4397;
+const toJulian=d=>d.valueOf()/dayMs-0.5+J1970;
+const fromJulian=j=>new Date((j+0.5-J1970)*dayMs);
+const toDays=d=>toJulian(d)-J2000;
+function sunTimes(date,lat,lng){
+  const lw=rad*-lng,phi=rad*lat,d=toDays(date),
+    n=Math.round(d-0.0009-lw/(2*Math.PI)),
+    M=rad*(357.5291+0.98560028*(0.0009+lw/(2*Math.PI)+n)),
+    L=M+rad*(1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M))+rad*102.9372+Math.PI,
+    dec=Math.asin(Math.sin(e0)*Math.sin(L)),
+    Jnoon=J2000+(0.0009+lw/(2*Math.PI)+n)+0.0053*Math.sin(M)-0.0069*Math.sin(2*L);
+  function ev(h){
+    const co=(Math.sin(rad*h)-Math.sin(phi)*Math.sin(dec))/(Math.cos(phi)*Math.cos(dec));
+    if(co>1||co<-1)return null;
+    const w=Math.acos(co),
+      Js=J2000+(0.0009+(w+lw)/(2*Math.PI)+n)+0.0053*Math.sin(M)-0.0069*Math.sin(2*L);
+    return{rise:fromJulian(Jnoon-(Js-Jnoon)),set:fromJulian(Js)};
+  }
+  const s=ev(-0.833),c=ev(-6);
+  return{sunrise:s&&s.rise,sunset:s&&s.set,dawn:c&&c.rise,dusk:c&&c.set,noon:fromJulian(Jnoon)};
+}
+
+/* ===================== ESTADO ===================== */
+let sel=0, wx=null, wxErr=null, kp=null, roads=null, lastFetch=null;
+
+function todayIndex(){
+  const t=isoDay(nowIS());
+  const i=DAYS.findIndex(d=>d.d===t);
+  return i<0?null:i;
+}
+function gustClass(g){return g==null?"":g>=20?"g-stop":g>=15?"g-warn":"g-ok"}
+
+/* ===================== DATOS EN VIVO ===================== */
+async function loadWeather(day){
+  const pts=[],seen=new Set();
+  day.stops.forEach(s=>{const k=s.la.toFixed(2)+","+s.lo.toFixed(2);
+    if(!seen.has(k)){seen.add(k);pts.push(s)}});
+  const u="https://api.open-meteo.com/v1/forecast"
+    +"?latitude="+pts.map(p=>p.la).join(",")
+    +"&longitude="+pts.map(p=>p.lo).join(",")
+    +"&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m,wind_gusts_10m,weather_code"
+    +"&wind_speed_unit=ms&timezone=UTC&start_date="+day.d+"&end_date="+day.d;
+  const r=await fetch(u);
+  if(!r.ok)throw new Error("open-meteo "+r.status);
+  let j=await r.json();
+  if(!Array.isArray(j))j=[j];
+  return pts.map((p,i)=>({stop:p,h:j[i]&&j[i].hourly}));
+}
+
+async function loadKp(){
+  const r=await fetch("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json");
+  const rows=await r.json();
+  const last=rows[rows.length-1];
+  return{kp:parseFloat(last[1]),when:last[0]};
+}
+
+/* El feed de Vegagerðin normalmente no manda cabeceras CORS, así que este
+   intento falla en la mayoría de navegadores. Se prueba y, si falla, la
+   tarjeta se queda con los enlaces directos. Nunca bloquea el resto. */
+async function loadRoads(){
+  const direct="https://gagnaveita.vegagerdin.is/api/faerd2017_1";
+  const relay="https://api.allorigins.win/raw?url="+encodeURIComponent(direct);
+  for(const [u,via] of [[direct,"oficial"],[relay,"vía relay público"]]){
+    try{
+      const r=await fetch(u,{cache:"no-store"});
+      if(!r.ok)continue;
+      const t=await r.text();
+      const j=JSON.parse(t);
+      const arr=Array.isArray(j)?j:(j.data||j.results||[]);
+      if(arr.length)return{via,rows:arr};
+    }catch(e){}
+  }
+  return null;
+}
+
+async function refresh(){
+  const day=DAYS[sel];
+  document.getElementById("refresh").textContent="…";
+  wx=null;wxErr=null;
+  try{wx=await loadWeather(day)}catch(e){wxErr=e.message}
+  render();
+  loadKp().then(k=>{kp=k;renderAurora()}).catch(()=>{});
+  loadRoads().then(r=>{roads=r;renderRoads()}).catch(()=>{});
+  lastFetch=new Date();
+  document.getElementById("refresh").textContent="Actualizar";
+  renderFoot();
+}
+
+/* ===================== CÁLCULOS ===================== */
+function windowHours(day){
+  // Si es hoy: de ahora a +6 h. Si no: todo el día entre la primera y la última parada.
+  const isToday=isoDay(nowIS())===day.d;
+  if(isToday){const h=nowIS().getUTCHours();return[h,Math.min(23,h+6)]}
+  const a=Math.floor(minsOf(day.stops[0].h)/60);
+  const b=Math.ceil(minsOf(day.stops[day.stops.length-1].h)/60);
+  return[a,Math.min(23,b)];
+}
+function statsFor(series,day){
+  if(!series||!series.h)return null;
+  const[a,b]=windowHours(day);
+  const g=series.h.wind_gusts_10m||[],t=series.h.temperature_2m||[],
+        p=series.h.precipitation||[],c=series.h.cloud_cover||[];
+  let mg=null,mt=null,tp=0,mc=null,n=0;
+  for(let i=a;i<=b;i++){
+    if(g[i]!=null){mg=mg==null?g[i]:Math.max(mg,g[i])}
+    if(t[i]!=null){mt=mt==null?t[i]:Math.min(mt,t[i])}
+    if(p[i]!=null){tp+=p[i]}
+    if(c[i]!=null){mc=(mc||0)+c[i];n++}
+  }
+  return{gust:mg,tmin:mt,precip:tp,cloud:n?Math.round(mc/n):null};
+}
+function dayVerdict(day){
+  if(wxErr||!wx)return{cls:"warn",title:"Sin pronóstico todavía",
+    reasons:[["Motivo",wxErr?("No cargó el pronóstico: "+wxErr):"Cargando…"]]};
+  const raw=wx.map(s=>statsFor(s,day));
+  const all=raw.filter(Boolean);
+  if(!all.length)return{cls:"warn",title:"Sin datos",reasons:[]};
+  const gust=Math.max(...all.map(s=>s.gust??0));
+  const tmin=Math.min(...all.map(s=>s.tmin??99));
+  const precip=Math.max(...all.map(s=>s.precip??0));
+  const wi=raw.findIndex(s=>s&&(s.gust??0)===gust);
+  const worst=wi>=0?wx[wi]:null;
+  const R=[];
+  R.push(["Ráfaga máx", Math.round(gust)+" m/s ("+Math.round(gust*3.6)+" km/h) en "+(worst?worst.stop.n:"ruta")]);
+  R.push(["Temperatura", Math.round(tmin)+" °C mínima en ruta"]);
+  R.push(["Lluvia/nieve", precip.toFixed(1)+" mm en la ventana"]);
+  R.push(["Manejo", day.km+" km · ~"+day.drive+" h"]);
+  let cls="ok",title="Condiciones normales para la van";
+  if(gust>=15){cls="warn";title="Ojo con el viento"}
+  if(tmin<=1&&precip>0.4){cls="warn";title="Riesgo de hielo en la carretera"}
+  if(gust>=20){cls="stop";title="No abras las puertas de la van"}
+  if(gust>=25){cls="stop";title="No manejes con esto"}
+  if(cls==="stop")R.unshift(["Qué hacer",gust>=25
+    ?"Quedarse en el camping o en un pueblo hasta que baje. Una puerta arrancada es el daño número uno en rentas islandesas."
+    :"Estacionar con la trompa contra el viento y abrir las puertas agarrando firme con las dos manos."]);
+  if(cls==="warn"&&gust>=15)R.unshift(["Qué hacer","Bajar la velocidad, las dos manos en el volante y cuidado al pasar camiones y al salir de túneles."]);
+  // luz
+  const first=day.stops[0],st=sunTimes(new Date(day.d+"T12:00:00Z"),first.la,first.lo);
+  if(st.sunset){
+    const end=minsOf(day.stops[day.stops.length-1].h);
+    const ss=st.sunset.getUTCHours()*60+st.sunset.getUTCMinutes();
+    if(end>ss+30)R.push(["Luz","El plan termina "+Math.round((end-ss)/60*10)/10+" h después del atardecer. Llevar frontales."]);
+  }
+  return{cls,title,reasons:R};
+}
+
+/* ===================== RENDER ===================== */
+function renderDays(){
+  const el=document.getElementById("days");el.innerHTML="";
+  DAYS.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.className="day"+(i===sel?" on":"");
+    const dd=new Date(d.d+"T12:00:00Z");
+    b.innerHTML="<b>"+dd.getUTCDate()+" "+MON[dd.getUTCMonth()]+"</b>"+DOW[dd.getUTCDay()].slice(0,3);
+    b.onclick=()=>{sel=i;renderDays();refresh()};
+    el.appendChild(b);
+  });
+}
+function renderVerdict(){
+  const day=DAYS[sel],v=dayVerdict(day);
+  const vd=document.getElementById("verdict");
+  vd.className="verdict "+v.cls;
+  document.getElementById("vtitle").textContent=v.title;
+  document.getElementById("vleg").textContent=prettyDate(day.d)+" · "+day.t;
+  document.getElementById("vreasons").innerHTML=
+    v.reasons.map(r=>"<li><span class='k'>"+r[0]+"</span><span class='v'>"+r[1]+"</span></li>").join("");
+}
+function renderWind(){
+  const day=DAYS[sel],el=document.getElementById("wind");
+  if(!wx){el.innerHTML="<p class='err'>"+(wxErr
+    ?"Sin pronóstico para este día. Open-Meteo llega hasta ~16 días adelante; volvé a abrir más cerca del viaje."
+    :"Cargando…")+"</p>";document.getElementById("windnote").textContent="";return}
+  el.innerHTML=wx.map(s=>{
+    const st=statsFor(s,day);if(!st)return"";
+    const g=st.gust==null?null:Math.round(st.gust);
+    return "<div class='wp "+gustClass(g)+"'><div class='nm'>"+s.stop.n+"</div>"
+      +"<div class='g'>"+(g??"–")+" <s>m/s</s></div>"
+      +"<div class='m'>"+(st.tmin==null?"":Math.round(st.tmin)+"°C · ")
+      +(st.precip?st.precip.toFixed(1)+" mm":"seco")+"</div></div>";
+  }).join("");
+  const[a,b]=windowHours(day);
+  document.getElementById("windnote").textContent=
+    "Ventana "+pad(a)+":00–"+pad(b)+":00. Verde <15 m/s · ámbar 15–20 · rojo 20+. "
+    +"A 20 m/s el viento arranca la puerta de la mano.";
+}
+function renderLight(){
+  const day=DAYS[sel],s0=day.stops[0];
+  const st=sunTimes(new Date(day.d+"T12:00:00Z"),s0.la,s0.lo);
+  const sum=document.getElementById("lightsum");
+  if(!st.sunrise){sum.textContent="Sin datos de sol.";return}
+  const dawn=st.dawn?hhmm(st.dawn):"–",sr=hhmm(st.sunrise),ss=hhmm(st.sunset),
+        dusk=st.dusk?hhmm(st.dusk):"–";
+  const hrs=((st.sunset-st.sunrise)/36e5).toFixed(1);
+  let extra="";
+  if(isoDay(nowIS())===day.d){
+    const left=(st.sunset-nowIS())/36e5;
+    extra=left>0?" · te quedan "+left.toFixed(1)+" h de luz":" · ya se hizo de noche";
+  }
+  sum.innerHTML="<b>"+hrs+" h de sol</b> <span class='mini'>en "+s0.n.split("—")[0].trim()+extra+"</span>";
+  const day0=0,day1=1440;
+  const m=d=>d?(d.getUTCHours()*60+d.getUTCMinutes()):0;
+  const segs=[["#0E1D25",0,m(st.dawn)],["#2C4A5C",m(st.dawn),m(st.sunrise)],
+    ["#9FD4E3",m(st.sunrise),m(st.sunset)],["#2C4A5C",m(st.sunset),m(st.dusk)],
+    ["#0E1D25",m(st.dusk),1440]];
+  document.getElementById("lightbar").innerHTML=segs.map(s=>
+    "<i style='background:"+s[0]+";width:"+((s[2]-s[1])/1440*100)+"%'></i>").join("");
+  document.getElementById("lightlabels").innerHTML=
+    "<span>hora azul "+dawn+"</span><span>sale "+sr+"</span><span>se pone "+ss+"</span><span>noche "+dusk+"</span>";
+}
+function renderPlan(){
+  const day=DAYS[sel],el=document.getElementById("plan");
+  const isToday=isoDay(nowIS())===day.d;
+  const nowM=nowIS().getUTCHours()*60+nowIS().getUTCMinutes();
+  let cur=-1;
+  if(isToday)day.stops.forEach((s,i)=>{if(minsOf(s.h)<=nowM)cur=i});
+  el.innerHTML=day.stops.map((s,i)=>
+    "<div class='row"+(i===cur?" now":"")+"'><div class='time'>"+s.h+"</div>"
+    +"<div class='what'><b>"+s.n+"</b>"+(i===cur?" <span class='tag t-ok'>aquí</span>":"")
+    +(s.x?"<div class='note'>"+s.x+"</div>":"")
+    +"<div class='note'><a href='https://www.google.com/maps/search/?api=1&query="
+    +encodeURIComponent(s.n.replace(/\s*\(.*?\)\s*/g,"")+", Iceland")+"'>Navegar</a>"
+    +" · <a href='https://www.google.com/maps/dir/?api=1&destination="+s.la+","+s.lo+"'>Por coordenadas</a>"
+    +"</div></div></div>").join("")
+   +(day.warn.length?"<div class='row'><div class='time'>!</div><div class='what'>"
+     +day.warn.map(w=>"<div class='note'>"+w+"</div>").join("")+"</div></div>":"");
+}
+function renderCamp(){
+  const day=DAYS[sel],el=document.getElementById("camp");
+  if(!day.camp){el.innerHTML="<div class='mini'>Último día: se entrega la van, no hay camping.</div>";return}
+  const c=CAMPS[day.camp];
+  const tagc=c.st==="pendiente"?"t-stop":c.st==="confirmar"?"t-warn":c.st==="decidir"?"t-warn":"t-ok";
+  const label=c.st==="pendiente"?"sin reservar":c.st==="confirmar"?"confirmar que abra":c.st==="decidir"?"sin decidir":"confirmado";
+  el.innerHTML="<div class='row'><div class='what'><b>"+c.n+"</b>"
+    +"<span class='tag "+tagc+"'>"+label+"</span>"
+    +"<div class='note'>"+c.note+"</div>"
+    +"<div class='note'><a href='"+c.url+"'>Sitio y reserva</a>"
+    +(c.tel?" · <a href='tel:"+c.tel+"'>Llamar</a>":"")
+    +" · <a href='https://www.google.com/maps/search/?api=1&query="
+    +encodeURIComponent(c.n.split("—")[0].split("/")[0].trim()+" campsite Iceland")+"'>Navegar</a>"
+    +"</div></div></div>"
+    +"<div class='row'><div class='what mini'>Dormir fuera de un camping está prohibido desde 2015, también para campers. No hay plan de “nos parqueamos por ahí”.</div></div>";
+}
+function renderServices(){
+  const day=DAYS[sel],el=document.getElementById("services");
+  const list=SERVICES[day.d]||[];
+  const ic={super:"Súper",gas:"Gasolina",lav:"Lavandería",aviso:"Ojo"};
+  el.innerHTML=list.map(s=>
+    "<div class='row'><div class='time mini'>"+ic[s.k]+"</div><div class='what'><b>"+s.n+"</b>"
+    +"<div class='note'>"+s.h+(s.k==="super"?" · horario típico, verificar en el local":"")+"</div>"
+    +(s.k==="aviso"?"":"<div class='note'><a href='https://www.google.com/maps/search/?api=1&query="
+      +encodeURIComponent(s.n+", Iceland")+"'>Navegar</a></div>")
+    +"</div></div>").join("")
+  +"<div class='row'><div class='time mini'>Baños</div><div class='what'>"
+  +"<b>Krapp</b><div class='note'>Mapa colaborativo de baños en Islandia. "
+  +"<a href='https://krapp.is/'>Abrir Krapp</a> · "
+  +"<a href='https://www.gocampers.is/grocery-stores-gas-stations/'>Lista de súper y gasolineras de GoCampers</a></div></div></div>";
+}
+function renderAurora(){
+  const el=document.getElementById("aurora"),day=DAYS[sel];
+  let cloud=null;
+  if(wx&&wx.length){
+    const last=wx[wx.length-1];
+    if(last&&last.h&&last.h.cloud_cover){
+      const c=last.h.cloud_cover.slice(20,24).filter(x=>x!=null);
+      if(c.length)cloud=Math.round(c.reduce((a,b)=>a+b,0)/c.length);
+    }
+  }
+  const k=kp?kp.kp:null;
+  const kcls=k==null?"t-mute":k>=5?"t-ok":k>=3?"t-warn":"t-mute";
+  const ktxt=k==null?"cargando":k>=5?"fuerte":k>=3?"decente":"flojo";
+  el.innerHTML="<div class='row'><div class='what'>"
+    +"<b>Kp ahora: "+(k==null?"–":k)+"</b><span class='tag "+kcls+"'>"+ktxt+"</span>"
+    +"<div class='note'>Con Kp 3 ya se ven desde Islandia si el cielo está despejado. "
+    +"Lo que manda de verdad son las nubes.</div></div></div>"
+    +"<div class='row'><div class='what'><b>Nubes en el camping, 20:00–23:00: "
+    +(cloud==null?"–":cloud+" %")+"</b>"
+    +"<div class='note'>"+(cloud==null?"Sin pronóstico todavía."
+      :cloud<40?"Vale la pena poner el despertador."
+      :cloud<75?"Puede abrirse a ratos. Revisar antes de dormir."
+      :"Cerrado. Mejor dormir.")+"</div>"
+    +"<div class='note'><a href='https://en.vedur.is/weather/forecasts/aurora/'>Pronóstico de auroras del Veðurstofan</a></div>"
+    +"</div></div>";
+}
+function renderRoads(){
+  const day=DAYS[sel],el=document.getElementById("roads");
+  const reg=REGION[day.d];
+  let head="";
+  if(roads){
+    head="<div class='row'><div class='what'><b>Feed de Vegagerðin cargado</b> "
+      +"<span class='tag t-ok'>"+roads.via+"</span>"
+      +"<div class='note'>"+roads.rows.length+" tramos recibidos. Este feed es crudo y en islandés; "
+      +"para leerlo bien usá el mapa.</div></div></div>";
+  }else{
+    head="<div class='row'><div class='what'><b>Estado en vivo: hay que abrirlo aparte</b>"
+      +"<span class='tag t-warn'>sin CORS</span>"
+      +"<div class='note'>Vegagerðin no deja que una página ajena lea su feed desde el navegador. "
+      +"Sin un backend propio, el mapa oficial se abre con un toque. Es el primer chequeo de cada mañana.</div>"
+      +"</div></div>";
+  }
+  el.innerHTML=head
+   +"<div class='row'><div class='what'><b>Región de hoy: "+reg+"</b>"
+   +"<div class='note'><a href='https://umferdin.is/en'>Mapa de carreteras (umferdin.is)</a> · "
+   +"<a href='https://umferdin.is/en/vefmyndavelar'>Cámaras en vivo</a></div></div></div>"
+   +"<div class='row'><div class='what mini'>Umferdin actualiza de 07:00 a 22:00 entre el 1 de octubre y el 30 de abril, "
+   +"y de 08:00 a 16:00 el resto del año. Del 27 al 30 de septiembre la última actualización del día es a las 16:00.</div></div>";
+}
+function renderLinks(){
+  const L=[
+   ["https://umferdin.is/en","Carreteras","umferdin.is · estado y cierres"],
+   ["https://en.vedur.is/weather/forecasts/areas/","Clima oficial","vedur.is · viento por hora"],
+   ["https://safetravel.is/alerts","Alertas","safetravel.is · avisos y rescate"],
+   ["https://krapp.is/","Baños","Krapp · mapa colaborativo"],
+   ["https://tjalda.is/is/","Campings","tjalda.is · directorio"],
+   ["https://www.gocampers.is/grocery-stores-gas-stations/","Súper y gasolina","GoCampers · lista por región"],
+   ["https://park4night.com/","Park4Night","paradas y servicios"],
+   ["https://www.landsvirkjun.is/rauntimavoktun/vatnshaed-halslons","Caudal de Hálslón","decide si Stuðlagil vale la pena"],
+   ["https://en.vedur.is/earthquakes-and-volcanism/","Volcanes","actividad en Reykjanes"],
+   ["tel:112","Emergencias 112","gratis, sin SIM, en toda la isla"]
+  ];
+  document.getElementById("links").innerHTML=L.map(l=>
+    "<a href='"+l[0]+"'"+(l[0]==="tel:112"?" class='sos'":"")+">"+l[1]+"<s>"+l[2]+"</s></a>").join("");
+}
+function renderFoot(){
+  const t=todayIndex();
+  let dot="dead",txt="sin actualizar";
+  if(lastFetch){const m=(Date.now()-lastFetch)/6e4;
+    dot=m<20?"live":m<120?"old":"dead";
+    txt="datos de hace "+(m<1?"menos de 1 min":Math.round(m)+" min");}
+  document.getElementById("foot").innerHTML=
+    "<span class='pill'><i class='dot "+dot+"'></i>"+txt+"</span><br><br>"
+    +"Pronóstico: Open-Meteo. Kp: NOAA SWPC. Sol: calculado en el teléfono, funciona sin señal. "
+    +"Carreteras y alertas: enlaces a Vegagerðin y Safetravel, que son la fuente que manda. "
+    +"Los horarios de súper son típicos y hay que verificarlos. "
+    +(t==null?"Hoy no es un día del viaje, así que no hay “ahora” que marcar.":"");
+}
+function render(){
+  renderDays();renderVerdict();renderWind();renderLight();
+  renderPlan();renderCamp();renderServices();renderAurora();renderRoads();renderFoot();
+}
+
+/* ===================== ARRANQUE ===================== */
+function tick(){
+  const n=nowIS();
+  document.getElementById("clock").innerHTML=hhmm(n)+"<span>Islandia</span>";
+  const t=todayIndex();
+  document.getElementById("daychip").textContent=
+    t==null?prettyDate(isoDay(n))+" · faltan "+Math.max(0,Math.round((new Date("2026-09-27T09:30:00Z")-n)/dayMs))+" días para el vuelo"
+           :"Día "+(t+1)+" de 11 · "+DAYS[t].t;
+}
+renderLinks();
+sel=todayIndex()??0;
+tick();setInterval(tick,30000);
+render();
+refresh();
+document.getElementById("refresh").onclick=refresh;
+</script>
+</body>
+</html>
